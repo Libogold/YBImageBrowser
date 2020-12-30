@@ -75,9 +75,19 @@ static NSUInteger const kMaskNull = 10000;
 
 - (void)startObserveDeviceOrientation {
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceOrientationDidChangeNotification:) name:UIDeviceOrientationDidChangeNotification object:nil];
+    [self setInterfaceOrientation:UIDeviceOrientationPortrait];
 }
 
+// 方法1：
+- (void)setInterfaceOrientation:(UIDeviceOrientation)orientation {
+      if ([[UIDevice currentDevice]   respondsToSelector:@selector(setOrientation:)]) {
+          [[UIDevice currentDevice] setValue:[NSNumber numberWithInteger:orientation]
+                                       forKey:@"orientation"];
+        }
+    }
+
 - (void)clear {
+    [self setInterfaceOrientation:UIDeviceOrientationPortrait];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 

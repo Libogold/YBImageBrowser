@@ -131,6 +131,9 @@ NSBundle *YBIBVideoBundle(void) {
         _videoDragCircleImage = ^UIImage * _Nullable{
             return [UIImage ybib_imageNamed:@"ybib_circlePoint" bundle:YBIBVideoBundle()];
         };
+        _videoChangeImage = ^UIImage * _Nullable{
+            return [UIImage ybib_imageNamed:@"ybib_change" bundle:YBIBVideoBundle()];
+        };
     }
     return self;
 }

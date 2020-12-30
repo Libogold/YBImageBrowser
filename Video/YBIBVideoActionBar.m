@@ -42,6 +42,7 @@
 @property (nonatomic, strong) UILabel *preTimeLabel;
 @property (nonatomic, strong) UILabel *sufTimeLabel;
 @property (nonatomic, strong) YBVideoBrowseActionSlider *slider;
+@property (nonatomic, strong) UIButton *changeButton;
 @end
 
 @implementation YBIBVideoActionBar {
@@ -58,6 +59,7 @@
         [self addSubview:self.preTimeLabel];
         [self addSubview:self.sufTimeLabel];
         [self addSubview:self.slider];
+        [self addSubview:self.changeButton];
     }
     return self;
 }
@@ -70,8 +72,9 @@
     
     self.playButton.frame = CGRectMake(10, 0, buttonWidth, height);
     self.preTimeLabel.frame = CGRectMake(CGRectGetMaxX(self.playButton.frame) + labelOffset - offset, 0, labelWidth, height);
-    self.sufTimeLabel.frame = CGRectMake(width - labelWidth - labelOffset, 0, labelWidth, height);
+    self.sufTimeLabel.frame = CGRectMake(width - labelWidth - labelOffset * 2 - buttonWidth, 0, labelWidth, height);
     self.slider.frame = CGRectMake(CGRectGetMaxX(self.preTimeLabel.frame), 0, CGRectGetMinX(self.sufTimeLabel.frame) - CGRectGetMaxX(self.preTimeLabel.frame), height);
+    self.changeButton.frame = CGRectMake(width - labelOffset - buttonWidth, 0, buttonWidth, height);
 }
 
 #pragma mark - public
@@ -128,6 +131,22 @@
     button.userInteractionEnabled = YES;
 }
 
+- (void)clickChangeButton:(UIButton *)button {
+    //button.selected = !button.selected;
+    UIDeviceOrientation expectOrientation = [UIDevice currentDevice].orientation;
+    NSLog(@"旋转,%ld",expectOrientation);
+    [self setInterfaceOrientation:expectOrientation == UIDeviceOrientationPortrait ? UIDeviceOrientationLandscapeLeft : UIDeviceOrientationPortrait];
+}
+
+// 方法1：
+- (void)setInterfaceOrientation:(UIDeviceOrientation)orientation {
+      if ([[UIDevice currentDevice]   respondsToSelector:@selector(setOrientation:)]) {
+          [[UIDevice currentDevice] setValue:[NSNumber numberWithInteger:orientation]
+                                       forKey:@"orientation"];
+        }
+    }
+
+
 - (void)respondsToSliderTouchFinished:(UISlider *)slider {
     [self.delegate yb_videoActionBar:self changeValue:slider.value];
 }
@@ -182,6 +201,20 @@
         [_slider addTarget:self action:@selector(respondsToSliderTouchDown:) forControlEvents:UIControlEventTouchDown];
     }
     return _slider;
+}
+
+- (UIButton *)changeButton {
+    if (!_changeButton) {
+        _changeButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        [_changeButton setImage:YBIBIconManager.sharedManager.videoChangeImage() forState:UIControlStateNormal];
+        //[_changeButton setImage:YBIBIconManager.sharedManager.videoPauseImage() forState:UIControlStateSelected];
+        [_changeButton addTarget:self action:@selector(clickChangeButton:) forControlEvents:UIControlEventTouchUpInside];
+        _changeButton.layer.shadowColor = UIColor.darkGrayColor.CGColor;
+        _changeButton.layer.shadowOffset = CGSizeMake(0, 1);
+        _changeButton.layer.shadowOpacity = 1;
+        _changeButton.layer.shadowRadius = 4;
+    }
+    return _changeButton;
 }
 
 - (BOOL)isTouchInside {
